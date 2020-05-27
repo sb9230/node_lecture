@@ -8,7 +8,7 @@ var homeRouter = require('./routes/home');
 var userRouter = require('./routes/user');
 
 app.use('/home', homeRouter)
-app.use('/user', userRoute)
+app.use('/user', userRouter)
 
 server.listen(port, function() {
     console.log("웹 서버 시작", port);
