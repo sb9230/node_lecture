@@ -4,6 +4,7 @@ var app = express();
 var server = http.createServer(app);
 var port = 3333;
 var path = require("path");
+var session = require("express-session");
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -11,6 +12,14 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use(
+  session({
+    secret: "120931;asdfABdspf399@#$@#$",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 var mysql = require("mysql2");
 const connection = mysql.createConnection({
@@ -22,7 +31,8 @@ const connection = mysql.createConnection({
 });
 
 app.get("/", function (req, res) {
-  res.render("home");
+  console.log(req.session);
+  res.render("home", { email: req.session.email });
 });
 
 // localhost:3333/list
@@ -34,12 +44,12 @@ app.get("/list", function (req, res) {
       console.log(err);
     }
     console.log(rows);
-    res.render("list", { users: rows });
+    res.render("list", { users: rows, email: req.session.email });
   });
 });
 
 app.get("/login", function (req, res) {
-  res.render("login", { error: false });
+  res.render("login", { error: false, email: req.session.email });
 });
 
 app.post("/login", function (req, res) {
@@ -51,17 +61,18 @@ app.post("/login", function (req, res) {
         console.log(err);
       }
       if (rows.length > 0) {
+        req.session.email = req.body.email;
         res.redirect("/");
       } else {
         console.log("rows ->", rows);
-        res.render("login", { error: true });
+        res.render("login", { error: true, email: req.session.email });
       }
     }
   );
 });
 
 app.get("/signup", function (req, res) {
-  res.render("signup", { errorMessage: null });
+  res.render("signup", { errorMessage: null, email: req.session.email });
 });
 
 app.post("/signup", function (req, res) {
@@ -78,7 +89,10 @@ app.post("/signup", function (req, res) {
     if (err) {
       console.log(err);
     } else if (users.length > 0) {
-      res.render("signup", { errorMessage: "이미 존재하는 이메일 입니다." });
+      res.render("signup", {
+        errorMessage: "이미 존재하는 이메일 입니다.",
+        email: req.session.email,
+      });
       console.log("users ->", users);
     } else {
       connection.query(
@@ -87,14 +101,31 @@ app.post("/signup", function (req, res) {
         function (error, user) {
           if (error) {
             console.log(error);
-            res.render("signup", { errorMessage: "회원 생성 시 오류 발생" });
+            res.render("signup", {
+              errorMessage: "회원 생성 시 오류 발생",
+              email: req.session.email,
+            });
           } else {
-            res.render("login", { error: false });
+            res.render("login", { error: false, email: req.session.email });
           }
         }
       );
     }
   });
+});
+
+app.get("/logout", function (req, res) {
+  if (req.session.email) {
+    req.session.destroy(function (err) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.redirect("/");
+      }
+    });
+  } else {
+    res.redirect("/");
+  }
 });
 
 server.listen(port, function () {
