@@ -544,3 +544,56 @@ app.get("/login", function (req, res) {
     ![N:M 예시 1](https://t1.daumcdn.net/cfile/tistory/250A2350594FB78A35)
     ![N:M 예시 2](http://postfiles2.naver.net/MjAxODAyMDFfMjg5/MDAxNTE3NDE5Njk4MDYw.NildtDjSNjeaGt8btFPP1rnN2FiJOJh3Sl42Ps2ssGEg.-uyoU_cWXeSy94wj8-qEqS8-1zLo-OAmSxeVeEl8nJkg.PNG.qbxlvnf11/20180201_022803.png?type=w773)
     - foreign key가 아닌 관계 table 생성 (-> 복합 키!)
+  - JOIN
+    ![Join 설명](https://t1.daumcdn.net/cfile/tistory/99219C345BE91A7E32)
+
+## 게시판
+
+### DB - Posts Table
+
+- Table 생성
+  ```sql
+  create table posts (
+    post_id int auto_increment primary key,
+    title varchar(100) not null,
+    contents text not null,
+    user_id int not null,
+    foreign key (user_id) references users(id)
+  );
+  ```
+- Value 추가
+  ```sql
+  insert into posts (title, contents, user_id) values ("포스트 제목", "포스트", 1);
+  ```
+- JOIN 비교하기
+
+  1. LEFT JOIN
+
+  ```sql
+  select * from posts
+    left join users
+     on user_id = users.id;
+  ```
+
+  2. RIGHT JOIN
+
+  ```sql
+  select * from posts
+     right join users
+     on user_id = users.id;
+  ```
+
+  3. LEFT JOIN WITH WHERE
+
+  ```sql
+  select * from posts
+  left join users
+  on user_id = users.id and post_id = 1;
+  ```
+
+  ```sql
+  select * from posts
+  left join users
+  on user_id = users.id
+  where post_id = 1;
+  ```
