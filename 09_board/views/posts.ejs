@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include ("./head.ejs") %>
+</head>
+<body>
+    <%- include ("./nav.ejs") %>
+    <div class="container">
+        <h2>게시판</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">번호</th>
+                    <th scope="col">제목</th>
+                    <th scope="col">작성자</th>
+                    <th scope="col">삭제</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (var post of posts) { %>
+                    <tr>
+                        <th scope="row"><%= post.post_id %></th>
+                        <td>
+                            <a href="/post/<%= post.post_id %>">
+                                <%= post.title %>
+                            </a>
+                        </td>
+                        <td><%= post.email %></td>
+                        <td>
+                            <a href="/post/delete/<%= post.post_id %>">
+                                <button type="button" class="btn btn-danger">삭제</button>
+                            </a>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+        
+        <a href="/posts/create">
+            <button type="button" class="btn btn-primary">+ New</button>
+        </a>
+    </div>
+</body>
+</html>
