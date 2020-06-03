@@ -597,3 +597,16 @@ app.get("/login", function (req, res) {
   on user_id = users.id
   where post_id = 1;
   ```
+
+## 게시판
+
+- 글쓰기 (create) O
+- 글 수정 (update) -> 작성자만
+- 글 삭제 (delete) O -> 작성자만
+- 글 불러오기 (read) - 1개씩 O
+- 목록 O
+- 게시판은 로그인한 유저만 접근 가능하도록 O
+
+```
+npm i --save express ejs mysql2 express-session
+```
