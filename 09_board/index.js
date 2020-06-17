@@ -127,7 +127,7 @@ app.get('/posts', function(req, res) {
         res.redirect('/logout')
     } else {
         connection.query(`
-            select post_id, title, email, user_id, view_count 
+            select post_id, title, email, user_id, view_count, likes 
                 from posts
                 left join users
                 on user_id = users.id
@@ -294,6 +294,39 @@ app.post('/post/edit/:postId', function(req, res) {
                     res.render('error');
                 } else {
                     res.redirect('/posts');
+                }
+            }
+        )
+    }
+})
+
+app.get('/post/like/:postId', function(req, res) {
+    if (!req.session.loggedIn) {
+        res.render('error');
+    } else {
+        const postId = req.params.postId;
+        connection.query(
+            `select likes from posts where post_id=?`,
+            [postId],
+            function(err, posts) {
+                if ( err ) {
+                    res.render('error');
+                } else if (posts.length < 1) {
+                    res.render('error');
+                } else {
+                    const target = posts[0];
+                    connection.query(
+                        `update posts set
+                            likes=? where post_id=?`,
+                        [target.likes + 1, postId],
+                        function(err, result) {
+                            if ( err ) {
+                                res.render('error')
+                            } else {
+                                res.redirect('/posts')
+                            }
+                        }
+                    )
                 }
             }
         )
