@@ -127,7 +127,8 @@ app.get('/posts', function(req, res) {
         res.redirect('/logout')
     } else {
         connection.query(`
-            select post_id, title, email from posts
+            select post_id, title, email, user_id, view_count 
+                from posts
                 left join users
                 on user_id = users.id
         `, function (err, posts) {
@@ -149,7 +150,8 @@ app.get('/post/:postId', function(req, res) {
     } else {
         const postId= req.params.postId;
         connection.query(`
-            select post_id, title, contents, email from posts
+            select post_id, title, contents, email, user_id, view_count 
+                from posts
                 left join users
                 on user_id = users.id
                 where post_id = ?
@@ -160,10 +162,29 @@ app.get('/post/:postId', function(req, res) {
                 console.log('post가 없음')
                 res.render('error');
             } else {
-                res.render('post', { 
-                    user: req.session.loggedIn,
-                    post: posts[0] 
-                });
+                const target = posts[0];
+                if (target.user_id == req.session.loggedIn.id) {
+                    res.render('post', { 
+                        user: req.session.loggedIn,
+                        post: posts[0] 
+                    });
+                } else {
+                    connection.query(
+                        `update posts set
+                            view_count=? where post_id=?`,
+                        [target.view_count + 1, postId],
+                        function(err, result) {
+                            if ( err ) {
+                                res.render('error');
+                            } else {
+                                res.render('post', { 
+                                    user: req.session.loggedIn,
+                                    post: posts[0] 
+                                });
+                            }
+                        }
+                    )
+                }
             }
         })
     }
@@ -194,7 +215,9 @@ app.get('/posts/create', function(req, res) {
         res.redirect('/logout')
     } else {
         res.render('editPost', {
-            user: req.session.loggedIn
+            user: req.session.loggedIn,
+            action: '/posts/create',
+            post: { title: "", contents: "" }
         })
     }
 });
@@ -209,6 +232,63 @@ app.post('/posts/create', function(req, res) {
             `insert into posts (title, contents, user_id)
                 values (?, ?, ?)`, 
             [title, contents, req.session.loggedIn.id], 
+            function(err, result) {
+                if ( err ) {
+                    res.render('error');
+                } else {
+                    res.redirect('/posts');
+                }
+            }
+        )
+    }
+})
+
+app.get('/post/edit/:postId', function(req, res) {
+    if ( !req.session.loggedIn ) {
+        res.redirect('/logout')
+    } else { 
+        const postId = req.params.postId;
+        connection.query(
+            `select * from posts
+                where user_id = ? and post_id = ?`,
+            [req.session.loggedIn.id, postId],
+            function(err, rows) {
+                if (err) {
+                    console.log(err);
+                    res.render('error');
+                } else if ( rows.length < 1) {
+                    res.render('error');
+                } else {
+                    res.render('editPost', {
+                        user: req.session.loggedIn,
+                        post: rows[0],
+                        action: '/post/edit/' + postId
+                    })
+                }
+            }
+        )
+    }
+})
+
+/**
+ * 업데이트 쿼리
+ * update posts set title="...", contents="..." where post_id = 1
+ * 
+ * -> 수정 페이지 POST method 만들기!
+ * 조건!
+ * - 오류 발생 시 error 페이지로 이동
+ * - 성공 시 /posts 페이지로 이동 (게시판 목록)
+ */
+app.post('/post/edit/:postId', function(req, res) {
+    if (!req.session.loggedIn) {
+        res.render('error');
+    } else {
+        const postId = req.params.postId;
+        const title = req.body.title;
+        const contents = req.body.contents;
+        connection.query(
+            `update posts set title=?, contents=? where post_id=?`,
+            [title, contents, postId],
             function(err, result) {
                 if ( err ) {
                     res.render('error');

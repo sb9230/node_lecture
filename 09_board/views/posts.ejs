@@ -12,27 +12,34 @@
                 <tr>
                     <th scope="col">번호</th>
                     <th scope="col">제목</th>
+                    <th scope="col">조회수</th>
                     <th scope="col">작성자</th>
                     <th scope="col">삭제</th>
                 </tr>
             </thead>
             <tbody>
-                <% for (var post of posts) { %>
+                <% posts.forEach( function(post, index) { %>
                     <tr>
-                        <th scope="row"><%= post.post_id %></th>
+                        <th scope="row"><%= index+1 %></th>
                         <td>
                             <a href="/post/<%= post.post_id %>">
                                 <%= post.title %>
                             </a>
                         </td>
+                        <td><%= post.view_count %></td>
                         <td><%= post.email %></td>
                         <td>
-                            <a href="/post/delete/<%= post.post_id %>">
-                                <button type="button" class="btn btn-danger">삭제</button>
-                            </a>
+                            <% if (post.user_id == user.id) { %>
+                                <a href="/post/edit/<%= post.post_id %>">
+                                    <i class="fas fa-edit" style="color: blue;"></i>
+                                </a>
+                                <a href="/post/delete/<%= post.post_id %>">
+                                    <i class="fas fa-trash-alt" style="color: red;"></i>
+                                </a>
+                            <% } %>
                         </td>
                     </tr>
-                <% } %>
+                <% }) %>
             </tbody>
         </table>
         

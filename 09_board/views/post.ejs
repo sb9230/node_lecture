@@ -24,10 +24,17 @@
                 disabled class="form-control" id="inputContents" 
                 rows="10"><%= post.contents %></textarea>
         </div>
-
-        <a href="/post/delete/<%= post.post_id %>">
-            <button type="button" class="btn btn-danger">삭제</button>
+        <a href="/posts">
+            <button type="button" class="btn btn-primary">목록보기</button>
         </a>
+        <% if (post.user_id == user.id) { %>
+            <a href="/post/edit/<%= post.post_id %>">
+                <button type="button" class="btn btn-secondary">수정</button>
+            </a>
+            <a href="/post/delete/<%= post.post_id %>">
+                <button type="button" class="btn btn-danger">삭제</button>
+            </a>
+        <% } %>
     </div>
 </body>
 </html>
