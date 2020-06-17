@@ -644,3 +644,26 @@ npm i --save express ejs mysql2 express-session
 2. 좋아요 개수를 목록에 표시. 
 3. 좋아요 버튼 추가
 4. 좋아요 버튼 눌렀을 때 좋아요 수 +1
+
+### 댓글 기능 추가 (1) 댓글 표시하기
+1. (DB) 댓글 저장을 위한 TABLE 생성
+- table 명: `comments`
+2. (DB) `comments` 테이블에 샘플 데이터 추가
+- `insert into comments ....`
+3. (ejs) 게시글 페이지 하단에 댓글 표시할 html 추가 
+4. (index.js/ejs) 게시글에 달린 댓글 불러와서 화면에 표시
+- ejs에서 for 문 사용
+
+### 댓글 기능 추가 (2) 댓글 추가하기
+1. (ejs) 댓글 생성을 위한 html 추가
+- form 사용하기
+2. (index.js/ejs) 댓글 추가 기능 처리
+- post method 사용
+- 댓글 추가 완료 시 게시글 페이지(`/post/...`)로 redirect
+
+### 심화
+1. 댓글 삭제
+2. 댓글 수정
+3. 댓글 좋아요
+4. (심화-안배운거) 댓글 입력 시간 표시
+5. (심화-안배운거) 댓글 입력 순으로 정렬
