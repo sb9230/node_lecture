@@ -610,3 +610,37 @@ app.get("/login", function (req, res) {
 ```
 npm i --save express ejs mysql2 express-session
 ```
+
+## 게시판
+- 글쓰기 (create) O
+- 글 수정 (update) -> 작성자만
+- 글 삭제 (delete) O -> 작성자만 
+- 글 불러오기 (read) - 1개씩 O
+- 목록 O
+- 게시판은 로그인한 유저만 접근 가능하도록 O
+
+```
+npm i --save express ejs mysql2 express-session
+```
+
+### 조회수
+- 처음 만들어진 글 조회수가 0
+- 글을 읽을 때마다 조회수 +1
+    (+ 작성자 이외)
+- 글 <- 조회수 -> post 테이블 안에 column 추가
+1. [O] post 테이블에 `view_count` column 추가
+    - int / default=0 / not null 
+2. [O] 조회수를 목록에 표시
+3. 글에 들어갔을 때 조회수 +1
+4. (+심화) 작성자 이외의 사람만 카운팅
+
+### 좋아요 ! 기능 추가하기
+- 기본 0, 버튼을 누를때마다 +1
+    (+심화: 한사람이 1좋아요만 가능) 
+- 좋아요버튼 - 목록에 표시
+- 목록에 좋아요 버튼 + 좋아요 개수
+<개발 순서>
+1. post 테이블에 `likes` column 추가
+2. 좋아요 개수를 목록에 표시. 
+3. 좋아요 버튼 추가
+4. 좋아요 버튼 눌렀을 때 좋아요 수 +1
