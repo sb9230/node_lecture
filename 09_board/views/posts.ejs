@@ -29,9 +29,13 @@
                         </td>
                         <td><%= post.view_count %></td>
                         <td>
-                            <a href="/post/like/<%= post.post_id %>">
+                            <% if (post.user_id != user.id) { %>
+                                <a href="/post/like/<%= post.post_id %>">
+                                    <i class="fas fa-heart"></i>
+                                </a>
+                            <% } else { %>
                                 <i class="fas fa-heart"></i>
-                            </a>
+                            <% } %>
                             <%= post.likes %>
                         </td>
                         <td><%= post.email %></td>
