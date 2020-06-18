@@ -127,10 +127,15 @@ app.get('/posts', function(req, res) {
         res.redirect('/logout')
     } else {
         connection.query(`
-            select post_id, title, email, user_id, view_count, likes 
-                from posts
-                left join users
-                on user_id = users.id
+        SELECT p.post_id, p.title, u.email, p.user_id, p.view_count, 
+                p.likes, count(c.post_id) AS comment_count
+        FROM posts AS p
+        LEFT JOIN users AS u
+            ON p.user_id = u.id
+        LEFT JOIN comments AS c
+            ON c.post_id = p.post_id
+        GROUP BY c.post_id, p.post_id
+        ORDER BY p.post_id ASC;
         `, function (err, posts) {
             if ( err ) {
                 res.render("error");
@@ -173,6 +178,7 @@ app.get('/post/:postId', function(req, res) {
                         if ( err ) {
                             res.render('error');
                         } else {
+                            console.log(comments);
                             const target = posts[0];
                             if (target.user_id == req.session.loggedIn.id) {
                                 res.render('post', { 
@@ -204,7 +210,7 @@ app.get('/post/:postId', function(req, res) {
             }
         })
     }
-});
+})
 
 app.get('/post/delete/:postId', function(req, res) {
     if (!req.session.loggedIn) {
@@ -343,6 +349,27 @@ app.get('/post/like/:postId', function(req, res) {
                             }
                         }
                     )
+                }
+            }
+        )
+    }
+})
+
+app.post('/comment/:postId', function(req, res) {
+    if ( !req.session.loggedIn ) {
+        res.render('error')
+    } else {
+        const postId = req.params.postId;
+        const description = req.body.desc;
+        connection.query(
+            `insert into comments (description, user_id, post_id)
+                values (?,?,?)`,
+            [description, req.session.loggedIn.id, postId],
+            function(err, result){
+                if ( err ) {
+                    res.render('error')
+                } else {
+                    res.redirect('/post/'+postId)
                 }
             }
         )
