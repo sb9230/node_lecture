@@ -538,7 +538,7 @@ ORDER BY p.post_id ASC;
 2. 설정하기
 ```sql
 - 데이터베이스 생성
-CREATE DATABASE board DEFAULT CHARSET=utf8 COLLATE=utf8_general_di;
+CREATE DATABASE board DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 USE board;
 
