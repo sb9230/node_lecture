@@ -530,3 +530,42 @@ LEFT JOIN comments AS c
 GROUP BY c.post_id, p.post_id
 ORDER BY p.post_id ASC;
 ```
+
+
+### RDS
+1. 접속
+* mysql -h 엔드포인트복사 -u root -p
+2. 설정하기
+```sql
+- 데이터베이스 생성
+CREATE DATABASE board DEFAULT CHARSET=utf8 COLLATE=utf8_general_di;
+
+- USER 테이블 생성
+CREATE TABLE users(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(50) NOT NULL,
+    password VARCHAR(50) not null,
+    age INT
+);
+
+- POST 테이블 생성
+CREATE TABLE posts (
+    post_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(50) NOT NULL,
+    contents VARCHAR(50) NOT NULL,
+    view_count INT NOT NULL DEFAULT 0,
+    likes INT NOT NULL DEFAULT 0,
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+- COMMENTS 테이블 생성
+CREATE TABLE comments (
+    comment_id INT AUTO_INCREMENT PRIMARY KEY,
+    description TEXT NOT NULL,
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (post_id) REFERENCES posts(post_id)
+)
+```
