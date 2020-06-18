@@ -162,33 +162,49 @@ app.get('/post/:postId', function(req, res) {
                 console.log('post가 없음')
                 res.render('error');
             } else {
-                const target = posts[0];
-                if (target.user_id == req.session.loggedIn.id) {
-                    res.render('post', { 
-                        user: req.session.loggedIn,
-                        post: posts[0] 
-                    });
-                } else {
-                    connection.query(
-                        `update posts set
-                            view_count=? where post_id=?`,
-                        [target.view_count + 1, postId],
-                        function(err, result) {
-                            if ( err ) {
-                                res.render('error');
-                            } else {
+                connection.query(
+                    `select comment_id, description, user_id, email from comments
+                        left join users
+                        on user_id = users.id
+                        where post_id = ?
+                        order by comment_id desc`,
+                    [postId],
+                    function(err, comments) {
+                        if ( err ) {
+                            res.render('error');
+                        } else {
+                            const target = posts[0];
+                            if (target.user_id == req.session.loggedIn.id) {
                                 res.render('post', { 
                                     user: req.session.loggedIn,
-                                    post: posts[0] 
+                                    post: posts[0],
+                                    comments: comments
                                 });
+                            } else {
+                                connection.query(
+                                    `update posts set
+                                        view_count=? where post_id=?`,
+                                    [target.view_count + 1, postId],
+                                    function(err, result) {
+                                        if ( err ) {
+                                            res.render('error');
+                                        } else {
+                                            res.render('post', { 
+                                                user: req.session.loggedIn,
+                                                post: posts[0],
+                                                comments: comments
+                                            });
+                                        }
+                                    }
+                                )
                             }
                         }
-                    )
-                }
+                    }
+                );
             }
         })
     }
-})
+});
 
 app.get('/post/delete/:postId', function(req, res) {
     if (!req.session.loggedIn) {
