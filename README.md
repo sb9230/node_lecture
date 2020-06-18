@@ -540,6 +540,8 @@ ORDER BY p.post_id ASC;
 - 데이터베이스 생성
 CREATE DATABASE board DEFAULT CHARSET=utf8 COLLATE=utf8_general_di;
 
+USE board;
+
 - USER 테이블 생성
 CREATE TABLE users(
     id INT AUTO_INCREMENT PRIMARY KEY,
