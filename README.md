@@ -571,3 +571,97 @@ CREATE TABLE comments (
     FOREIGN KEY (post_id) REFERENCES posts(post_id)
 )
 ```
+
+## 배포 (Hosting)
+1. RDS 새로 만들기
+2. EC2 -> 클라우드 컴퓨터 생성
+3. 프로젝트 파일을 원격 컴퓨터에 옮기기
+(쉬운버전)
+4. 프로젝트 실행
+5. EC2에 IP를 연결해서 IP로 프로젝트 접근
+(어려운버전)
+4, 5 동일
+
+### RDS
+1. 접속
+* mysql -h 엔드포인트복사 -u root -p
+2. 설정하기
+```sql
+- 데이터베이스 생성
+CREATE DATABASE board DEFAULT CHARSET=utf8 COLLATE=utf8_general_di;
+
+- USER 테이블 생성
+CREATE TABLE users(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(50) NOT NULL,
+    password VARCHAR(50) not null,
+    age INT
+);
+
+- POST 테이블 생성
+CREATE TABLE posts (
+    post_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(50) NOT NULL,
+    contents VARCHAR(50) NOT NULL,
+    view_count INT NOT NULL DEFAULT 0,
+    likes INT NOT NULL DEFAULT 0,
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+- COMMENTS 테이블 생성
+CREATE TABLE comments (
+    comment_id INT AUTO_INCREMENT PRIMARY KEY,
+    description TEXT NOT NULL,
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (post_id) REFERENCES posts(post_id)
+)
+```
+3. `index.js`에서 connection 변경
+```js
+const connection = mysql.createConnection({
+    host: 'blockchain-database.c7pvhdlpkam9.ap-northeast-2.rds.amazonaws.com', // 엔드포인트
+    port: 3306,
+    user: 'root',
+    password: 'test1234', // RDS 비밀번호
+    database: 'board' // 데이터베이스 이름
+})
+```
+
+### Filezilla 연결
+- 파일-사이트관리자
+- New Site
+- 프로토콜 - SFTP로 변경
+- 호스트에 ec2 주소 입력(ec2...)
+- 로그온유형 - 키파일 
+    - 찾아보기
+    - .ssh로 가서 All files로 변경
+    - 키파일 눌러서 열기
+    - 사용자이름 ubuntu
+- 연결!
+
+### NVM 설치
+```
+$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash (복사)
+$ source ~/.bashrc
+$ nvm --version
+$ nvm install 12.18.0
+$ nvm use 12.18.0
+프로젝트 패키지 설치 (express, ejs...) 
+- 프로젝트 파일이 있는 폴더에서!
+$ npm install
+$ npm install -g nodemon
+$ npm start
+```
+
+
+### Node 강제 종료
+```
+$ sudo netstat -lpn | grep :3333
+-> id 4자리숫자
+$ kill -9 0000
+-> 0000에 id 입력
+```
+
