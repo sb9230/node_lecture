@@ -665,3 +665,56 @@ $ kill -9 0000
 -> 0000에 id 입력
 ```
 
+
+# Day 8
+## PM2
+```
+$ npm i -g pm2 - pm2 설치
+$ pm2 start index.js - pm2로 node index.js 실행 
+$ pm2 list - pm2 앱 목록 확인하기
+$ pm2 monit - pm2 모니터링
+$ pm2 stop 이름
+$ pm2 delete 이름
+```
+
+## nginx
+### nginx 설치
+1. `sudo apt-get update`: apt-get 명령어 업데이트
+2. `sudo apt-get install nginx`: nginx 설치
+3. `sudo systemctl start nginx`: nginx 서버 실행
+4. ec2의 ip 주소 들어가서 어떻게 나오는지 확인
+
+기본 설정 파일 확인하기
+1. `/var/www/html`
+2. `cd /etc/nginx/sites-available`
+3. `vi default`
+
+권한 수정
+1. `cd /var/www`
+2. `sudo chmod 777 html`
+
+파일 추가
+1. `/var/www/html` 경로에 폴더 생성
+2. 폴더에 프로젝트 파일 복사 (node_modules 제외)
+
+1. 프로젝트 경로로 이동
+2. `npm i` -> node_modules 설치
+3. `npm i -g pm2` -> pm2 패키지 설치
+4. `pm2 start index.js` -> pm2로 실행하기
+5. ip 포트 3333으로 실행 -> 프로젝트 실행 확인
+6. `sudo vi /etc/nginx/sites-available/default` -> 설정 파일로 이동
+7. `i` 눌러서 수정 모드
+8. proxy_pass를 설정
+    ```
+    server {
+        listen 80......
+
+        # index index....  -> 주석처리
+        location / {
+            proxy_pass http://localhost:3333;
+            ....
+        }
+    }
+    ```
+9. `esc`->`:wq` 수정한거 저장하고 끄기
+10. `sudo systemctl restart nginx`
